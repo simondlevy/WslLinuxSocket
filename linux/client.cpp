@@ -20,12 +20,10 @@ static void error(const char * msg)
 
 int main(int argc, char* argv[]) 
 {
-    char Buf[100] = { 0 };
-    ssize_t BytesRecvd = 0;
-    struct sockaddr_un clientAddr = { 0 };
-    struct sockaddr_un serverAddr = { 0 };
-    struct sockaddr_un address = { 0 };
-    char serverAddress[100] = { 0 };
+    struct sockaddr_un clientAddr = {};
+    struct sockaddr_un serverAddr = {};
+    struct sockaddr_un address = {};
+    char serverAddress[100] = {};
     int serverFd = 0, rc = 0, clientFd = 0;
     int acceptFd = 0;
     socklen_t addrLen = 0;
@@ -65,8 +63,16 @@ int main(int argc, char* argv[])
 
     while (true) {
 
-        if ((BytesRecvd = recv(clientFd, Buf, sizeof(Buf), 0)) == -1) {
+        char Buf[100] = {};
+
+        auto BytesRecvd = recv(clientFd, Buf, sizeof(Buf), 0);
+
+        if (BytesRecvd == -1) {
             error("recv");
+        }
+
+        if (BytesRecvd == 0) {
+            break;
         }
 
         printf("received: %zd bytes, %s\n", BytesRecvd, Buf);

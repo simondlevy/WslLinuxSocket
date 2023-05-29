@@ -4,6 +4,7 @@
 #include <sys/un.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <unistd.h>
 
 #define SERVER_SOCKET "../WslLinuxSocket/server.sock"
@@ -61,10 +62,15 @@ int main(int argc, char* argv[])
     }
 
     printf("getpeername returned: %s, addressize: %d\n", clientAddr.sun_path, addrLen);
-    if ((BytesRecvd = recv(clientFd, Buf, sizeof(Buf), 0)) == -1) {
-        error("recv");
+
+    while (true) {
+
+        if ((BytesRecvd = recv(clientFd, Buf, sizeof(Buf), 0)) == -1) {
+            error("recv");
+        }
+
+        printf("received: %zd bytes, %s\n", BytesRecvd, Buf);
     }
 
-    printf("received: %zd bytes, %s\n", BytesRecvd, Buf);
     return 0;
 }

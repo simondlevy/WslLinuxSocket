@@ -1,7 +1,7 @@
 PROJECT: client
 
 $(PROJECT): $(PROJECT).c
-	gcc -o $(PROJECT) $(PROJECT).c
+	gcc -Wall -o $(PROJECT) $(PROJECT).c
 
 run: client
 	./client

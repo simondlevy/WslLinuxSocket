@@ -18,15 +18,9 @@
 
 #define SERVER_SOCKET "server.sock"
 
-static void error(
-        const SOCKET ClientSocket,
-        const SOCKET ListenSocket,
-        const char * cmd,
-        const int result)
-{
-    printf("%s failed with error: %d\n", cmd, result);
 
-    // cleanup
+static void closeSockets(const SOCKET ClientSocket, const SOCKET ListenSocket) 
+{
     if (ListenSocket != INVALID_SOCKET) {
         closesocket(ListenSocket);
     }
@@ -34,6 +28,17 @@ static void error(
     if (ClientSocket != INVALID_SOCKET) {
         closesocket(ClientSocket);
     }
+}
+
+static void error(
+        const SOCKET ClientSocket,
+        const SOCKET ListenSocket,
+        const char * cmd,
+        const int result)
+{
+    closeSockets(ClientSocket, ListenSocket);
+
+    printf("%s failed with error: %d\n", cmd, result);
 
     // Analogous to `unlink`
     DeleteFileA(SERVER_SOCKET);
@@ -108,7 +113,7 @@ int main()
         if (SendResult == SOCKET_ERROR) {
             error(ClientSocket, ListenSocket, "sendn");
         }
-        printf("Relayed %zu bytes: '%s'\n", strlen(SendBuffer), SendBuffer);
+        printf("Relayed %zu bytes\n", sizeof(SendBuffer));
     }
 
     // shutdown the connection.
@@ -117,6 +122,8 @@ int main()
     if (Result == SOCKET_ERROR) {
         error(ClientSocket, ListenSocket, "shutdown");
     }
+
+    closeSockets(ClientSocket, ListenSocket);
 
     return 0;
 }

@@ -4,8 +4,10 @@
 #include <sys/un.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #define SERVER_SOCKET "../WslLinuxSocket/server.sock"
 #define CLIENT_SOCKET "client.sock"
@@ -17,6 +19,32 @@ static void error(const char * msg)
     unlink(CLIENT_SOCKET);
     exit(1);
 }
+
+static void report(void)
+{
+    static uint64_t count;
+    static double time_prev;
+
+    static const uint64_t MAX_COUNT = 10000;
+
+    count++;
+
+    if (count == MAX_COUNT) {
+
+        struct timeval time = {};
+        gettimeofday(&time, NULL);
+
+        double time_curr = time.tv_sec + (double)time.tv_usec/1e6;
+
+        if (time_prev > 0) {
+            printf("%3.3e Hz\n", MAX_COUNT / (time_curr - time_prev));
+        }
+
+        time_prev = time_curr;
+        count = 0;
+    }
+}
+
 
 int main(int argc, char* argv[]) 
 {
@@ -70,7 +98,8 @@ int main(int argc, char* argv[])
             break;
         }
 
-        printf("received: %zd bytes\n", BytesRecvd);
+        // printf("received: %zd bytes\n", BytesRecvd);
+        report();
     }
 
     return 0;

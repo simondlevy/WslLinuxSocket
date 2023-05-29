@@ -18,7 +18,6 @@
 
 #define SERVER_SOCKET "server.sock"
 
-
 static void closeSockets(const SOCKET ClientSocket, const SOCKET ListenSocket) 
 {
     if (ListenSocket != INVALID_SOCKET) {

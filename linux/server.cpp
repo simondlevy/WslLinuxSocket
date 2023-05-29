@@ -8,8 +8,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 
-#define CLIENT_SOCKET "../WslLinuxSocket/client.sock"
-#define SERVER_SOCKET "../WslLinuxSocket/server.sock"
+#define CLIENT_SOCKET "client.sock"
+#define SERVER_SOCKET "./server.sock"
 
 int main(int argc, char* argv[]) 
 {

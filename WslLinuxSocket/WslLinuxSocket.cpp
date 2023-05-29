@@ -113,7 +113,7 @@ int main()
         if (SendResult == SOCKET_ERROR) {
             error(ClientSocket, ListenSocket, "sendn");
         }
-        printf("Relayed %zu bytes\n", sizeof(SendBuffer));
+        // printf("Relayed %zu bytes\n", sizeof(SendBuffer));
     }
 
     // shutdown the connection.

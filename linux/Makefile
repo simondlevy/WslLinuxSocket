@@ -1,7 +1,10 @@
-PROJECT: client
+ALL: client server
 
-$(PROJECT): $(PROJECT).cpp
-	g++ -Wall -o $(PROJECT) $(PROJECT).c
+client: client.cpp
+	g++ -Wall -o client client.cpp
+
+server: server.cpp
+	g++ -Wall -o server server.cpp
 
 run: client
 	./client
@@ -10,4 +13,4 @@ edit:
 	vim client.cpp
 
 clean:
-	rm -rf client *.o *.sock
+	rm -rf client server *.o *.sock

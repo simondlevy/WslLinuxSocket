@@ -20,18 +20,12 @@ static void error(const char * msg)
 
 int main(int argc, char* argv[]) 
 {
-    struct sockaddr_un clientAddr = {};
-    struct sockaddr_un serverAddr = {};
-    struct sockaddr_un address = {};
-    char serverAddress[100] = {};
-    int serverFd = 0, rc = 0, clientFd = 0;
-    int acceptFd = 0;
-    socklen_t addrLen = 0;
-
+    int clientFd = 0;
     if ((clientFd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         error("clientFd socket error");
     }
 
+    struct sockaddr_un clientAddr = {};
     clientAddr.sun_family = AF_UNIX;
     strncpy(clientAddr.sun_path, CLIENT_SOCKET, sizeof(clientAddr.sun_path) - 1);
     if (bind(clientFd, (struct sockaddr*)&clientAddr, sizeof(clientAddr)) == -1) {
@@ -40,12 +34,13 @@ int main(int argc, char* argv[])
         return 0;
     }
 
-    addrLen = sizeof(clientAddr);
+    socklen_t addrLen = sizeof(clientAddr);
     if (getsockname(clientFd, (struct sockaddr*)&clientAddr, &addrLen) == -1) {
         error("getsockname(client)");
     }
 
     printf("getsockname returned: %s, addressize: %d\n", clientAddr.sun_path, addrLen);
+    struct sockaddr_un serverAddr = {};
     serverAddr.sun_family = AF_UNIX;
     strncpy(serverAddr.sun_path, SERVER_SOCKET, sizeof(serverAddr.sun_path));
     printf("client: connecting to %s\n", SERVER_SOCKET);
@@ -63,7 +58,7 @@ int main(int argc, char* argv[])
 
     while (true) {
 
-        char Buf[100] = {};
+        char Buf[17*8] = {};
 
         auto BytesRecvd = recv(clientFd, Buf, sizeof(Buf), 0);
 
@@ -75,7 +70,7 @@ int main(int argc, char* argv[])
             break;
         }
 
-        printf("received: %zd bytes, %s\n", BytesRecvd, Buf);
+        printf("received: %zd bytes\n", BytesRecvd);
     }
 
     return 0;

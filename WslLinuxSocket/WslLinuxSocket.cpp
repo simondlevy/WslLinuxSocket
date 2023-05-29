@@ -55,7 +55,7 @@ int main()
     SOCKET ClientSocket = INVALID_SOCKET;
     SOCKET ListenSocket = INVALID_SOCKET;
     int Result = 0;
-    char SendBuffer[] = "af_unix from Windows to WSL!";
+    char SendBuffer[17*8];
     int SendResult = 0;
     SOCKADDR_UN ServerSocket = { 0 };
     WSADATA WsaData = { 0 };
@@ -104,7 +104,7 @@ int main()
 
     while (true) {
 
-        SendResult = send(ClientSocket, SendBuffer, (int)strlen(SendBuffer), 0);
+        SendResult = send(ClientSocket, SendBuffer, sizeof(SendBuffer), 0);
         if (SendResult == SOCKET_ERROR) {
             error(ClientSocket, ListenSocket, "sendn");
         }

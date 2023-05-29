@@ -10,4 +10,4 @@ edit:
 	vim client.c
 
 clean:
-	rm -rf $(PROJECT) *.o
+	rm -rf client *.o *.sock

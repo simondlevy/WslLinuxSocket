@@ -7,7 +7,7 @@ run: client
 	./client
 
 edit:
-	vim $(PROJECT).c
+	vim client.c
 
 clean:
 	rm -rf $(PROJECT) *.o

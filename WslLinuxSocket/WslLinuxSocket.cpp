@@ -15,114 +15,45 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ws2tcpip.h>
+#include <ws2tcpip.h>
 
 #define SERVER_SOCKET "server.sock"
 
-static void closeSockets(const SOCKET ClientSocket, const SOCKET ListenSocket) 
+static void error(const char * msg)
 {
-    if (ListenSocket != INVALID_SOCKET) {
-        closesocket(ListenSocket);
-    }
-
-    if (ClientSocket != INVALID_SOCKET) {
-        closesocket(ClientSocket);
-    }
-}
-
-static void error(
-        const SOCKET ClientSocket,
-        const SOCKET ListenSocket,
-        const char * cmd,
-        const int result)
-{
-    closeSockets(ClientSocket, ListenSocket);
-
-    printf("%s failed with error: %d\n", cmd, result);
-
-    // Analogous to `unlink`
-    DeleteFileA(SERVER_SOCKET);
-    WSACleanup();
-
+    printf("ERROR: %s\n", msg);
     exit(1);
-}
-
-static void error(
-        const SOCKET ClientSocket,
-        const SOCKET ListenSocket,
-        const char * cmd)
-{
-    error(ClientSocket, ListenSocket, cmd, WSAGetLastError());
 }
 
 int main()
 {
-    SOCKET ClientSocket = INVALID_SOCKET;
-    SOCKET ListenSocket = INVALID_SOCKET;
-    int Result = 0;
-    char SendBuffer[17*8];
-    int SendResult = 0;
-    SOCKADDR_UN ServerSocket = { 0 };
-    WSADATA WsaData = { 0 };
+    struct addrinfo * _addressInfo;
 
-    // Initialize Winsock
-    Result = WSAStartup(MAKEWORD(2, 2), &WsaData);
-    if (Result != 0) {
-        error(ClientSocket, ListenSocket, "WSAStartup", Result);
+    bool _connected;
+
+    char _message[200];
+
+    WSADATA wsaData;
+    int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        error("WSAStartup");
     }
 
-    // Create a AF_UNIX stream server socket.
-    ListenSocket = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (ListenSocket == INVALID_SOCKET) {
-        error(ClientSocket, ListenSocket, "socket");
+    SOCKET newsock;
+    if ((newsock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+        error("socket");
     }
 
-    ServerSocket.sun_family = AF_UNIX;
-    strncpy_s(
-            ServerSocket.sun_path,
-            sizeof ServerSocket.sun_path,
-            SERVER_SOCKET, (sizeof SERVER_SOCKET) - 1);
+    char sun_path[256] = {};
+    sprintf_s(sun_path, "server.sock");
 
-    // Bind the socket to the path.
-    Result = bind(
-            ListenSocket,
-            (struct sockaddr*)&ServerSocket, sizeof(ServerSocket));
-    if (Result == SOCKET_ERROR) {
-        error(ClientSocket, ListenSocket, "bind");
-    }
+    SOCKADDR_UN serveraddr = {};
+    serveraddr.sun_family = AF_UNIX;
+    strcpy_s(serveraddr.sun_path, sun_path);
 
-    // Listen to start accepting connections.
-    Result = listen(ListenSocket, SOMAXCONN);
-    if (Result == SOCKET_ERROR) {
-        error(ClientSocket, ListenSocket, "listen");
-    }
+    auto error = connect(newsock, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
 
-    printf("Accepting connections on: '%s'\n", SERVER_SOCKET);
-    // Accept a connection.
-    ClientSocket = accept(ListenSocket, NULL, NULL);
-    if (ClientSocket == INVALID_SOCKET) {
-        error(ClientSocket, ListenSocket, "accept");
-    }
-    printf("Accepted a connection.\n");
-
-    // Send some data.
-
-    while (true) {
-
-        SendResult = send(ClientSocket, SendBuffer, sizeof(SendBuffer), 0);
-        if (SendResult == SOCKET_ERROR) {
-            error(ClientSocket, ListenSocket, "sendn");
-        }
-        // printf("Relayed %zu bytes\n", sizeof(SendBuffer));
-    }
-
-    // shutdown the connection.
-    printf("Shutting down\n");
-    Result = shutdown(ClientSocket, 0);
-    if (Result == SOCKET_ERROR) {
-        error(ClientSocket, ListenSocket, "shutdown");
-    }
-
-    closeSockets(ClientSocket, ListenSocket);
+    printf("ERROR=%d\n", error);
 
     return 0;
 }

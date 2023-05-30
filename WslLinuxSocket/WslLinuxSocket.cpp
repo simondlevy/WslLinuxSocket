@@ -27,8 +27,8 @@ int main()
         error("WSAStartup");
     }
 
-    SOCKET newsock;
-    if ((newsock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
+    SOCKET sockfd;
+    if ((sockfd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         error("socket");
     }
 
@@ -39,14 +39,14 @@ int main()
     serveraddr.sun_family = AF_UNIX;
     strcpy_s(serveraddr.sun_path, sun_path);
 
-    if (connect(newsock, (struct sockaddr *)&serveraddr, sizeof(serveraddr))) {
+    if (connect(sockfd, (struct sockaddr *)&serveraddr, sizeof(serveraddr))) {
         error("connect");
     }
 
     while (true) {
 
         double x[17] = {};
-        send(newsock, (const char *)x, sizeof(x), 0);
+        send(sockfd, (const char *)x, sizeof(x), 0);
     }
 
     return 0;

@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ws2tcpip.h>
-#include <ws2tcpip.h>
 
 #define SERVER_SOCKET "server.sock"
 
@@ -51,9 +50,15 @@ int main()
     serveraddr.sun_family = AF_UNIX;
     strcpy_s(serveraddr.sun_path, sun_path);
 
-    auto error = connect(newsock, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
+    if (connect(newsock, (struct sockaddr *)&serveraddr, sizeof(serveraddr))) {
+        error("connect");
+    }
 
-    printf("ERROR=%d\n", error);
+    while (true) {
+
+        double x[17] = {};
+        send(newsock, (const char *)x, sizeof(x), 0);
+    }
 
     return 0;
 }

@@ -1,13 +1,35 @@
-#include <sys/socket.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <string.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <sys/un.h>
-#include <signal.h>
 
 static const char * SERVER = "../WslLinuxSocket/server.sock";
+
+static void report(void)
+{
+    struct timeval time = {};
+    gettimeofday(&time, NULL);
+
+    static uint32_t prev_sec;
+    static uint32_t count;
+
+    if (time.tv_sec != prev_sec) {
+        if (count != 0) {
+            printf("%3.3e Hz", (double)count);
+        }
+        printf("\n");
+        count = 0;
+        prev_sec = time.tv_sec;
+    }
+
+    count++;
+}
 
 int main(int argc, char *argv[])
 {
@@ -29,20 +51,16 @@ int main(int argc, char *argv[])
 
     auto connfd = accept(sockfd, NULL, NULL);
 
-    /*
-     * Listen for connections
-     * and send random phrase on accept
-     */
     while (true) {
 
-        break;
+        double x[17] = {};
 
-        //int r = rand() % num_of_lines; //Pick random phrase/hint pair
-        //write(connfd, phrases[r], strlen(phrases[r]));
+        read(connfd, x, sizeof(x));
 
-        close(connfd);
-        sleep(1);
+        report();
     }
+
+    close(connfd);
 
     exit(0);
 }

@@ -1,22 +1,15 @@
 // https://devblogs.microsoft.com/commandline/windowswsl-interop-with-af_unix/
 
-#undef UNICODE
-
 #define WIN32_LEAN_AND_MEAN
-#define RECVSIZE size_t
-#undef TEXT
 
 #pragma comment(lib,"ws2_32.lib")
 
-#include <iostream>
 #include <winsock2.h>
-#include <windows.h>
 #include <afunix.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ws2tcpip.h>
 
-#define SERVER_SOCKET "server.sock"
+static const char * SERVER_SOCKET = "server.sock";
 
 static void error(const char * msg)
 {

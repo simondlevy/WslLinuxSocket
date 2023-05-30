@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <unistd.h>
-#include <string.h>
 #include <signal.h>
 #include <sys/socket.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <sys/un.h>
 
 static const char * SERVER = "../WslLinuxSocket/server.sock";

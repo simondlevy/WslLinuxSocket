@@ -21,10 +21,6 @@ int main()
 {
     struct addrinfo * _addressInfo;
 
-    bool _connected;
-
-    char _message[200];
-
     WSADATA wsaData;
     int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
